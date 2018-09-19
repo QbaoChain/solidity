@@ -36,13 +36,19 @@ contract ServerConfigFunction {
 }
 
 contract ServerConfigManager {
-    string public paramGetServerConfig;
-    string public paramSetServerConfig;
-    string public contractAddress;
+    string contractAddress;
+    string paramGetServerConfig;
+    string paramSetServerConfig;
     
     // constructor
     constructor () public {
         owner = msg.sender;
+        
+        // will delete
+        // contractAddress = "2c406a57f2c12ad1c3b262a5acc9d0333dc803f8";
+        // paramGetServerConfig = "93eb57e1";
+        // paramSetServerConfig = "abcdefgh";
+        
     }
     
     // modifier
@@ -55,19 +61,22 @@ contract ServerConfigManager {
     }
     
     // set
-    function setParamGetServerConfig(string param) onlyOwner public
-    {
+    function setParamGetServerConfig(string param) onlyOwner public {
         paramGetServerConfig = param;
     }
     
-    function setParamSetServerConfig(string param) onlyOwner public
-    {
+    function setParamSetServerConfig(string param) onlyOwner public {
         paramSetServerConfig = param;
     }
     
-    function setContractAddress(string add) onlyOwner public
-    {
+    function setContractAddress(string add) onlyOwner public {
         contractAddress = add;
+    }
+    
+    // get
+    function getAddressAndParam() public view returns (string add, 
+    string paramGet, string paramSet) {
+        return(contractAddress, paramGetServerConfig, paramSetServerConfig);
     }
     
     // destructor
