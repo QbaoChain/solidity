@@ -1,10 +1,8 @@
 pragma solidity ^0.4.22;
 
 contract ServerConfigFunction {
-    string[] public keyStringArr;
+    string[] keyStringArr;
     mapping (string => string) serverConfigMap;
-    
-    string ret;
     
     // constructor
     constructor () public {
@@ -33,18 +31,17 @@ contract ServerConfigFunction {
         }
     }
     
-    // get all
+    // get all config
     function getAllServerConfig() internal view  returns (string) {
         if (keyStringArr.length == 0) {
             return "";
         }
         
-        ret = "{";
+        string memory ret = "{";
         
         for (uint256 i=0; i<keyStringArr.length; ++i) {
             string memory key = keyStringArr[i];
             string memory value = serverConfigMap[key];
-            
             
             ret = addString(ret, '"');
             ret = addString(ret, key);
@@ -57,10 +54,10 @@ contract ServerConfigFunction {
             if (i+1 != keyStringArr.length) {
                 ret = addString(ret, ",");
             }
+            else {
+                ret = addString(ret, "}");
+            }
         }
-        
-        ret = addString(ret, "}");
-        
         
         return ret;
     }
@@ -83,17 +80,19 @@ contract ServerConfigFunction {
         }
     }
     
+    // compare string
     function compareString(string a, string  b) internal pure returns (bool) {
-        return keccak256(a) == keccak256(b);
+        return keccak256(bytes(a)) == keccak256(bytes(b));
     }
     
-    function addString(string _a, string _b) internal returns (string){
+    // string add string
+    function addString(string _a, string _b) internal pure returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
         string memory retb = new string(_ba.length + _bb.length);
         bytes memory bret = bytes(retb);
         uint k = 0;
-        for (uint i = 0; i < _ba.length; i++)bret[k++] = _ba[i];
+        for (uint i = 0; i < _ba.length; i++) bret[k++] = _ba[i];
         for (i = 0; i < _bb.length; i++) bret[k++] = _bb[i];
         return string(bret);
    }
