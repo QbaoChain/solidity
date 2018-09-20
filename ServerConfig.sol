@@ -21,7 +21,7 @@ contract ServerConfigFunction {
         _;
     }
     
-    // get
+    // get config by key
     function getServerConfig(string key) public view returns (string) {
         if (compareString(key,"")) {
             return getAllServerConfig();
@@ -32,7 +32,7 @@ contract ServerConfigFunction {
     }
     
     // get all config
-    function getAllServerConfig() internal view  returns (string) {
+    function getAllServerConfig() internal view returns (string) {
         if (keyStringArr.length == 0) {
             return "";
         }
@@ -62,7 +62,7 @@ contract ServerConfigFunction {
         return ret;
     }
     
-    // set
+    // set config
     function setServerConfig(string key, string value) public payable {
         serverConfigMap[key] = value;
         
@@ -80,15 +80,15 @@ contract ServerConfigFunction {
         }
     }
     
-    // compare string
+    // compare string equality
     function compareString(string a, string  b) internal pure returns (bool) {
         return keccak256(bytes(a)) == keccak256(bytes(b));
     }
     
-    // string add string
-    function addString(string _a, string _b) internal pure returns (string){
-        bytes memory _ba = bytes(_a);
-        bytes memory _bb = bytes(_b);
+    // string + string
+    function addString(string a, string b) internal pure returns (string) {
+        bytes memory _ba = bytes(a);
+        bytes memory _bb = bytes(b);
         string memory retb = new string(_ba.length + _bb.length);
         bytes memory bret = bytes(retb);
         uint k = 0;
@@ -127,20 +127,20 @@ contract ServerConfigManager {
         _;
     }
     
-    // set
-    function setParamGetServerConfig(string param) onlyOwner public {
-        paramGetServerConfig = param;
-    }
-    
-    function setParamSetServerConfig(string param) onlyOwner public {
-        paramSetServerConfig = param;
-    }
-    
-    function setContractAddress(string add) onlyOwner public {
+    // set address & param
+    function setContractAddress(string add) onlyOwner public payable {
         contractAddress = add;
     }
     
-    // get
+    function setParamGetServerConfig(string param) onlyOwner public payable {
+        paramGetServerConfig = param;
+    }
+    
+    function setParamSetServerConfig(string param) onlyOwner public payable {
+        paramSetServerConfig = param;
+    }
+    
+    // get address & param
     function getAddressAndParam() public view returns (string add, 
     string paramGet, string paramSet) {
         return(contractAddress, paramGetServerConfig, paramSetServerConfig);
