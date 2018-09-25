@@ -49,6 +49,23 @@ contract ServerConfigFunction {
         }
     }
     
+    // delete config
+    function deleteServerConfig(string key) public payable {
+        bool isExist = false;
+        
+        for (uint256 i=0; i<keyStringArr.length; ++i) {
+            if (compareString(keyStringArr[i], key)) {
+                isExist = true;
+                break;
+            }
+        }
+        
+        if (isExist) {
+            deleteByIndex(i);
+            delete serverConfigMap[key];
+        }
+    }
+    
     // private
     // get all config
     function getAllServerConfig() internal view returns (string) {
@@ -79,6 +96,22 @@ contract ServerConfigFunction {
         }
         
         return ret;
+    }
+    
+    // delete arr by index
+    function deleteByIndex(uint256 index) internal {
+        uint256 len = keyStringArr.length;
+        
+        if (index >= len) {
+            return;
+        }
+        
+        for (uint256 i = index; i<len-1; ++i) {
+            keyStringArr[i] = keyStringArr[i+1];
+        }
+        
+        delete keyStringArr[len-1];
+        keyStringArr.length--;
     }
     
     // compare string equality
@@ -149,6 +182,13 @@ contract ServerConfigManager {
         ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
         
         contractFunction.setServerConfig.value(msg.value)(key, value);
+    }
+    
+    function deleteServerConfig(string key) public payable {
+        ServerConfigFunction contractFunction = 
+        ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
+        
+        contractFunction.deleteServerConfig.value(msg.value)(key);
     }
     
     // private
