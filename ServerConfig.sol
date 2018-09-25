@@ -21,7 +21,7 @@ contract ServerConfigFunction {
         _;
     }
     
-    // get config by key
+    // get config
     function getServerConfig(string key) public view returns (string) {
         if (compareString(key,"")) {
             return getAllServerConfig();
@@ -31,6 +31,25 @@ contract ServerConfigFunction {
         }
     }
     
+    // set config
+    function setServerConfig(string key, string value) public payable {
+        serverConfigMap[key] = value;
+        
+        bool isExist = false;
+        
+        for (uint256 i=0; i<keyStringArr.length; ++i) {
+            if (compareString(keyStringArr[i], key)) {
+                isExist = true;
+                break;
+            }
+        }
+        
+        if (!isExist) {
+            keyStringArr.push(key);
+        }
+    }
+    
+    // private
     // get all config
     function getAllServerConfig() internal view returns (string) {
         if (keyStringArr.length == 0) {
@@ -62,24 +81,6 @@ contract ServerConfigFunction {
         return ret;
     }
     
-    // set config
-    function setServerConfig(string key, string value) public payable {
-        serverConfigMap[key] = value;
-        
-        bool isExist = false;
-        
-        for (uint256 i=0; i<keyStringArr.length; ++i) {
-            if (compareString(keyStringArr[i], key)) {
-                isExist = true;
-                break;
-            }
-        }
-        
-        if (!isExist) {
-            keyStringArr.push(key);
-        }
-    }
-    
     // compare string equality
     function compareString(string a, string  b) internal pure returns (bool) {
         return keccak256(bytes(a)) == keccak256(bytes(b));
@@ -92,13 +93,20 @@ contract ServerConfigFunction {
         string memory retb = new string(_ba.length + _bb.length);
         bytes memory bret = bytes(retb);
         uint k = 0;
-        for (uint i = 0; i < _ba.length; i++) bret[k++] = _ba[i];
-        for (i = 0; i < _bb.length; i++) bret[k++] = _bb[i];
+        
+        for (uint i=0; i<_ba.length; ++i) {
+            bret[k++] = _ba[i];
+        }
+        
+        for (i=0; i<_bb.length; ++i) {
+            bret[k++] = _bb[i];
+        }
+        
         return string(bret);
    }
     
     // destructor
-    function kill() onlyOwner public {
+    function destructor() onlyOwner public {
         selfdestruct(this);
     }
 }
@@ -106,16 +114,10 @@ contract ServerConfigFunction {
 contract ServerConfigManager {
     string contractAddress;
     string paramGetServerConfig;
-    string paramSetServerConfig;
     
     // constructor
     constructor () public {
         owner = msg.sender;
-        
-        // will delete
-        // contractAddress = "2c406a57f2c12ad1c3b262a5acc9d0333dc803f8";
-        // paramGetServerConfig = "93eb57e1";
-        // paramSetServerConfig = "abcdefgh";
     }
     
     // modifier
@@ -127,7 +129,7 @@ contract ServerConfigManager {
         _;
     }
     
-    // set address & param
+    // set address & param(get)
     function setContractAddress(string add) onlyOwner public payable {
         contractAddress = add;
     }
@@ -136,18 +138,45 @@ contract ServerConfigManager {
         paramGetServerConfig = param;
     }
     
-    function setParamSetServerConfig(string param) onlyOwner public payable {
-        paramSetServerConfig = param;
+    // get address & param
+    function getAddressAndParam() public view returns (string, string) {
+        return(contractAddress, paramGetServerConfig);
     }
     
-    // get address & param
-    function getAddressAndParam() public view returns (string add, 
-    string paramGet, string paramSet) {
-        return(contractAddress, paramGetServerConfig, paramSetServerConfig);
+    // set function
+    function setServerConfig(string key, string value) public payable {
+        ServerConfigFunction contractFunction = 
+        ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
+        
+        contractFunction.setServerConfig.value(msg.value)(key, value);
+    }
+    
+    // private
+    // bytes to address
+    function bytesToAddress (bytes b) internal pure returns (address) {
+        uint result = 0;
+        
+        for (uint i = 0; i < b.length; i++) {
+            uint c = uint(b[i]);
+            
+            if (c >= 48 && c <= 57) {
+                result = result * 16 + (c - 48);
+            }
+            
+            if (c >= 65 && c<= 90) {
+                result = result * 16 + (c - 55);
+            }
+            
+            if (c >= 97 && c<= 122) {
+                result = result * 16 + (c - 87);
+            }
+        }
+        
+        return address(result);
     }
     
     // destructor
-    function kill() onlyOwner public {
+    function destructor() onlyOwner public {
         selfdestruct(this);
     }
 }
