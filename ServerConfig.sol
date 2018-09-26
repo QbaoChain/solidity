@@ -1,38 +1,33 @@
 pragma solidity ^0.4.22;
 
-contract ServerConfigFunction {
+import "github.com/turanturan/solidityTool/ToolsFunction.sol";
+
+contract ServerConfigFunction is ToolsFunction {
     string[] keyStringArr;
     mapping (string => string) serverConfigMap;
     
-    // constructor
-    constructor () public {
-        owner = msg.sender;
-        
+    // init data
+    function initData() internal
+    {
         keyStringArr.push("WEB_PAY_URL");
         serverConfigMap["WEB_PAY_URL"] = "payx://webpay/";
     }
     
-    // modifier
-    address owner;
-    modifier onlyOwner {
-        if (msg.sender != owner) {
-            return;
-        }
-        _;
-    }
-    
+    /* external function */
     // get config
-    function getServerConfig(string key) public view returns (string) {
+    function getServerConfig(string key) external constant returns (string) {
+        // get all config
         if (compareString(key,"")) {
             return getAllServerConfig();
         }
+        // get config by key
         else {
             return serverConfigMap[key];
         }
     }
     
     // set config
-    function setServerConfig(string key, string value) public payable {
+    function setServerConfig(string key, string value) external payable {
         serverConfigMap[key] = value;
         
         bool isExist = false;
@@ -49,8 +44,8 @@ contract ServerConfigFunction {
         }
     }
     
-    // delete config
-    function deleteServerConfig(string key) public payable {
+    // del config
+    function deleteServerConfig(string key) external payable {
         bool isExist = false;
         
         for (uint256 i=0; i<keyStringArr.length; ++i) {
@@ -61,14 +56,14 @@ contract ServerConfigFunction {
         }
         
         if (isExist) {
-            deleteByIndex(i);
+            deleteByIndex(keyStringArr, i);
             delete serverConfigMap[key];
         }
     }
     
-    // private
+    /* private function */
     // get all config
-    function getAllServerConfig() internal view returns (string) {
+    function getAllServerConfig() private constant returns (string) {
         if (keyStringArr.length == 0) {
             return "";
         }
@@ -97,126 +92,42 @@ contract ServerConfigFunction {
         
         return ret;
     }
-    
-    // delete arr by index
-    function deleteByIndex(uint256 index) internal {
-        uint256 len = keyStringArr.length;
-        
-        if (index >= len) {
-            return;
-        }
-        
-        for (uint256 i = index; i<len-1; ++i) {
-            keyStringArr[i] = keyStringArr[i+1];
-        }
-        
-        delete keyStringArr[len-1];
-        keyStringArr.length--;
-    }
-    
-    // compare string equality
-    function compareString(string a, string  b) internal pure returns (bool) {
-        return keccak256(bytes(a)) == keccak256(bytes(b));
-    }
-    
-    // string + string
-    function addString(string a, string b) internal pure returns (string) {
-        bytes memory _ba = bytes(a);
-        bytes memory _bb = bytes(b);
-        string memory retb = new string(_ba.length + _bb.length);
-        bytes memory bret = bytes(retb);
-        uint k = 0;
-        
-        for (uint i=0; i<_ba.length; ++i) {
-            bret[k++] = _ba[i];
-        }
-        
-        for (i=0; i<_bb.length; ++i) {
-            bret[k++] = _bb[i];
-        }
-        
-        return string(bret);
-   }
-    
-    // destructor
-    function destructor() onlyOwner public {
-        selfdestruct(this);
-    }
 }
 
-contract ServerConfigManager {
+contract ServerConfigManager is ToolsFunction {
     string contractAddress;
     string paramGetServerConfig;
     
-    // constructor
-    constructor () public {
-        owner = msg.sender;
-    }
-    
-    // modifier
-    address owner;
-    modifier onlyOwner {
-        if (msg.sender != owner) {
-            return;
-        }
-        _;
-    }
-    
-    // set address & param(get)
-    function setContractAddress(string add) onlyOwner public payable {
+    /* onlyOwner function */
+    // set address
+    function setContractAddress(string add) onlyOwner external payable {
         contractAddress = add;
     }
     
-    function setParamGetServerConfig(string param) onlyOwner public payable {
+    // set param(get)
+    function setParamGetServerConfig(string param) onlyOwner external payable {
         paramGetServerConfig = param;
     }
     
+    /* external function */
     // get address & param
-    function getAddressAndParam() public view returns (string, string) {
+    function getAddressAndParam() external constant returns (string, string) {
         return(contractAddress, paramGetServerConfig);
     }
     
     // set function
-    function setServerConfig(string key, string value) public payable {
+    function setServerConfig(string key, string value) external payable {
         ServerConfigFunction contractFunction = 
         ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
         
         contractFunction.setServerConfig.value(msg.value)(key, value);
     }
     
-    function deleteServerConfig(string key) public payable {
+    // del function
+    function deleteServerConfig(string key) external payable {
         ServerConfigFunction contractFunction = 
         ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
         
         contractFunction.deleteServerConfig.value(msg.value)(key);
-    }
-    
-    // private
-    // bytes to address
-    function bytesToAddress (bytes b) internal pure returns (address) {
-        uint result = 0;
-        
-        for (uint i = 0; i < b.length; i++) {
-            uint c = uint(b[i]);
-            
-            if (c >= 48 && c <= 57) {
-                result = result * 16 + (c - 48);
-            }
-            
-            if (c >= 65 && c<= 90) {
-                result = result * 16 + (c - 55);
-            }
-            
-            if (c >= 97 && c<= 122) {
-                result = result * 16 + (c - 87);
-            }
-        }
-        
-        return address(result);
-    }
-    
-    // destructor
-    function destructor() onlyOwner public {
-        selfdestruct(this);
     }
 }
