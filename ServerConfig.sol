@@ -7,8 +7,7 @@ contract ServerConfigFunction is ToolsFunction {
     mapping (string => string) serverConfigMap;
     
     // init data
-    function initData() internal
-    {
+    function initData() internal {
         keyStringArr.push("WEB_PAY_URL");
         serverConfigMap["WEB_PAY_URL"] = "payx://webpay/";
     }
@@ -95,8 +94,12 @@ contract ServerConfigFunction is ToolsFunction {
 }
 
 contract ServerConfigManager is ToolsFunction {
-    string contractAddress;
-    string paramGetServerConfig;
+    string public contractAddress;
+    
+    // init data
+    function initData() internal {
+        
+    }
     
     /* onlyOwner function */
     // set address
@@ -104,17 +107,7 @@ contract ServerConfigManager is ToolsFunction {
         contractAddress = add;
     }
     
-    // set param(get)
-    function setParamGetServerConfig(string param) onlyOwner external payable {
-        paramGetServerConfig = param;
-    }
-    
     /* external function */
-    // get address & param
-    function getAddressAndParam() external constant returns (string, string) {
-        return(contractAddress, paramGetServerConfig);
-    }
-    
     // set function
     function setServerConfig(string key, string value) external payable {
         ServerConfigFunction contractFunction = 

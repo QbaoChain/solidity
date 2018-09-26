@@ -1,4 +1,4 @@
-pragma solidity ^0.4.22;
+pragma solidity >=0.4.0;
 
 contract ToolsFunction {
     // modifier
@@ -10,10 +10,20 @@ contract ToolsFunction {
         _;
     }
     
+    // constructor
+    constructor () public {
+        owner = msg.sender;
+        
+        initData();
+    }
+    
     // destructor
     function destructor() onlyOwner public {
         selfdestruct(this);
     }
+    
+    // init
+    function initData() internal;
     
     // bytes to address
     function bytesToAddress (bytes b) internal pure returns (address) {
