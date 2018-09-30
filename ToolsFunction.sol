@@ -25,6 +25,17 @@ contract ToolsFunction {
     // init
     function initData() internal;
     
+    // bytes32 to bytes
+    function bytes32ToBytes(bytes32 by) internal pure returns (bytes) {
+        bytes memory ret = new bytes(by.length);
+        
+        for(uint i = 0; i < by.length; i++) {
+            ret[i] = by[i];
+        }
+        
+        return ret;
+    }
+    
     // bytes to address
     function bytesToAddress (bytes b) internal pure returns (address) {
         uint result = 0;
@@ -51,6 +62,11 @@ contract ToolsFunction {
     // compare string equality
     function compareString(string a, string  b) internal pure returns (bool) {
         return keccak256(bytes(a)) == keccak256(bytes(b));
+    }
+    
+    // compare bytes32 equality
+    function compareBytes(bytes32 a, bytes32 b) internal pure returns (bool) {
+        return keccak256(bytes32ToBytes(a)) == keccak256(bytes32ToBytes(b));
     }
     
     // string + string
@@ -86,6 +102,22 @@ contract ToolsFunction {
         
         delete intArr[len-1];
         intArr.length--;
+    }
+    
+    // delete bytes32 arr by index
+    function deleteByIndex(bytes32[] storage bytes32Arr, uint256 index) internal {
+        uint256 len = bytes32Arr.length;
+        
+        if (index >= len) {
+            return;
+        }
+        
+        for (uint256 i = index; i<len-1; ++i) {
+            bytes32Arr[i] = bytes32Arr[i+1];
+        }
+        
+        delete bytes32Arr[len-1];
+        bytes32Arr.length--;
     }
     
     // delete str arr by index

@@ -14,7 +14,7 @@ contract ServerConfigFunction is ToolsFunction {
     
     /* external function */
     // get config
-    function getServerConfig(string key) external constant returns (string) {
+    function getServerConfig(string key) external view returns (string) {
         // get all config
         if (compareString(key,"")) {
             return getAllServerConfig();
@@ -26,7 +26,7 @@ contract ServerConfigFunction is ToolsFunction {
     }
     
     // set config
-    function setServerConfig(string key, string value) external payable {
+    function setServerConfig(string key, string value) external {
         serverConfigMap[key] = value;
         
         bool isExist = false;
@@ -44,7 +44,7 @@ contract ServerConfigFunction is ToolsFunction {
     }
     
     // del config
-    function deleteServerConfig(string key) external payable {
+    function deleteServerConfig(string key) external {
         bool isExist = false;
         
         for (uint256 i=0; i<keyStringArr.length; ++i) {
@@ -62,7 +62,7 @@ contract ServerConfigFunction is ToolsFunction {
     
     /* private function */
     // get all config
-    function getAllServerConfig() private constant returns (string) {
+    function getAllServerConfig() private view returns (string) {
         if (keyStringArr.length == 0) {
             return "";
         }
@@ -95,6 +95,7 @@ contract ServerConfigFunction is ToolsFunction {
 
 contract ServerConfigManager is ToolsFunction {
     string public contractAddress;
+    ServerConfigFunction contractFunction;
     
     // init data
     function initData() internal {
@@ -103,24 +104,19 @@ contract ServerConfigManager is ToolsFunction {
     
     /* onlyOwner function */
     // set address
-    function setContractAddress(string add) onlyOwner external payable {
+    function setContractAddress(string add) onlyOwner external {
         contractAddress = add;
+        contractFunction = ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
     }
     
     /* external function */
     // set function
-    function setServerConfig(string key, string value) external payable {
-        ServerConfigFunction contractFunction = 
-        ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
-        
-        contractFunction.setServerConfig.value(msg.value)(key, value);
+    function setServerConfig(string key, string value) external {
+        contractFunction.setServerConfig(key, value);
     }
     
     // del function
-    function deleteServerConfig(string key) external payable {
-        ServerConfigFunction contractFunction = 
-        ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
-        
-        contractFunction.deleteServerConfig.value(msg.value)(key);
+    function deleteServerConfig(string key) external {
+        contractFunction.deleteServerConfig(key);
     }
 }
