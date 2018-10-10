@@ -33,9 +33,9 @@ contract SafeMath {
   }
 }
 
-contract QbaoNetwork is SafeMath{
-    string public name = "QbaoNetwork";
-    string public symbol = "QBT";
+contract FBR is SafeMath{
+    string public name = "FBR";
+    string public symbol = "FBR";
     uint8 public decimals = 18;
     uint256 public totalSupply = 10**26;
 	address public owner;
@@ -51,7 +51,7 @@ contract QbaoNetwork is SafeMath{
     event Burn(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function QbaoNetwork() {
+    function FBR() {
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
 		owner = msg.sender;
     }
