@@ -63,14 +63,14 @@ contract FBR2 is SafeMath{
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
-        emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
+        Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) returns (bool success) {
 		require(_value > 0); 
         allowance[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
+        Approval(msg.sender, _spender, _value);
         return true;
     }
        
@@ -84,7 +84,7 @@ contract FBR2 is SafeMath{
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                           // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                             // Add the same to the recipient
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
-        emit Transfer(_from, _to, _value);
+        Transfer(_from, _to, _value);
         return true;
     }
 }
