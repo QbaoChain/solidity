@@ -33,9 +33,9 @@ contract SafeMath {
   }
 }
 
-contract FBR2 is SafeMath{
-    string public name = "FBR2";
-    string public symbol = "FBR2";
+contract QBT is SafeMath{
+    string public name = "QBT";
+    string public symbol = "QBT";
     uint8 public decimals = 18;
     uint256 public totalSupply = 100000000 * 10 ** uint(decimals);
 	address public owner;
@@ -50,7 +50,7 @@ contract FBR2 is SafeMath{
 
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function FBR2() {
+    function QBT() {
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
 		owner = msg.sender;
     }
