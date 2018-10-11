@@ -33,11 +33,11 @@ contract SafeMath {
   }
 }
 
-contract FBR is SafeMath{
-    string public name = "FBR";
-    string public symbol = "FBR";
+contract FBR2 is SafeMath{
+    string public name = "FBR2";
+    string public symbol = "FBR2";
     uint8 public decimals = 18;
-    uint256 public totalSupply = 10**26;
+    uint256 public totalSupply = 100000000 * 10 ** uint(decimals);
 	address public owner;
 
     /* This creates an array with all balances */
@@ -46,12 +46,11 @@ contract FBR is SafeMath{
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
-    /* This notifies clients about the amount burnt */
-    event Burn(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function FBR() {
+    function FBR2() {
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
 		owner = msg.sender;
     }
@@ -64,14 +63,14 @@ contract FBR is SafeMath{
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
-        Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
+        emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
 
     /* Allow another contract to spend some tokens in your behalf */
-    function approve(address _spender, uint256 _value)
-        returns (bool success) {
+    function approve(address _spender, uint256 _value) returns (bool success) {
 		require(_value > 0); 
         allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
        
