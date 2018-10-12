@@ -1,8 +1,42 @@
 pragma solidity >=0.4.0;
 
-contract ToolsFunction {
+// safe math
+library SafeMath {
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a * b;
+        assert(a == 0 || c / a == b);
+         return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b > 0);
+        uint256 c = a / b;
+        assert(a == b * c + a % b);
+        return c;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        assert(c >= a && c >= b);
+        return c;
+    }
+}
+
+// owner
+contract Owner {
+    address public owner;
+    
+    // constructor
+    constructor() public {
+        owner = msg.sender;
+    }
+    
     // modifier
-    address owner;
     modifier onlyOwner {
         if (msg.sender != owner) {
             return;
@@ -10,10 +44,20 @@ contract ToolsFunction {
         _;
     }
     
+    // transfer ownership
+    function transferOwnership(address newOwner) onlyOwner external {
+        if (newOwner != address(0)) {
+            owner = newOwner;
+        }
+    }
+}
+
+// tools function
+contract ToolsFunction is Owner {
+    using SafeMath for uint256;
+    
     // constructor
-    constructor () public {
-        owner = msg.sender;
-        
+    constructor() public {
         initData();
     }
     

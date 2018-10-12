@@ -6,6 +6,9 @@ contract ServerConfigFunction is ToolsFunction {
     string[] keyStringArr;
     mapping (string => string) serverConfigMap;
     
+    event SetServerConfig(string key, string value);
+    event DeleteServerConfig(string key);
+    
     // init data
     function initData() internal {
         keyStringArr.push("WEB_PAY_URL");
@@ -41,6 +44,8 @@ contract ServerConfigFunction is ToolsFunction {
         if (!isExist) {
             keyStringArr.push(key);
         }
+        
+        emit SetServerConfig(key, value);
     }
     
     // del config
@@ -57,6 +62,7 @@ contract ServerConfigFunction is ToolsFunction {
         if (isExist) {
             deleteByIndex(keyStringArr, i);
             delete serverConfigMap[key];
+            emit DeleteServerConfig(key);
         }
     }
     
@@ -97,6 +103,10 @@ contract ServerConfigManager is ToolsFunction {
     string public contractAddress;
     ServerConfigFunction contractFunction;
     
+    event SetContractAddress(string add);
+    event SetServerConfig(string key, string value);
+    event DeleteServerConfig(string key);
+    
     // init data
     function initData() internal {
         
@@ -107,16 +117,19 @@ contract ServerConfigManager is ToolsFunction {
     function setContractAddress(string add) onlyOwner external {
         contractAddress = add;
         contractFunction = ServerConfigFunction(bytesToAddress(bytes(contractAddress)));
+        emit SetContractAddress(add);
     }
     
     /* external function */
     // set function
     function setServerConfig(string key, string value) external {
         contractFunction.setServerConfig(key, value);
+        emit SetServerConfig(key, value);
     }
     
     // del function
     function deleteServerConfig(string key) external {
         contractFunction.deleteServerConfig(key);
+        emit DeleteServerConfig(key);
     }
 }
